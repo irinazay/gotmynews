@@ -1,0 +1,365 @@
+:root {
+  --color-primary: rgb(195, 245, 60);
+  --color-primary-dark: rgb(180, 241, 11);
+  --color-button: rgb(0, 200, 5);
+  --color-button-dark: rgba(3, 173, 9, 0.822);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-size: 62.5%;
+  /* 1rem = 10px, 10px/16px = 62.5% */
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 400;
+  line-height: 1.6;
+  background-color: white;
+  padding: 30px;
+}
+
+.content {
+  max-width: 120rem;
+  background-color: var(--color-primary);
+}
+
+/* *************** */
+/* NAV */
+/* *************** */
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+#nav_link {
+  display: flex;
+  align-self: center;
+}
+
+.nav_link {
+  list-style-type: none;
+  text-decoration: none;
+  color: black;
+  padding: 6px 30px;
+  font-size: 1.3rem;
+}
+
+.icon-mail-checked {
+  height: 2.5rem;
+  fill: #ff4500;
+  width: 2.5rem;
+}
+
+.nav-left {
+  margin-left: 1.5rem;
+  display: flex;
+  padding-top: 10px;
+}
+
+.nav_name {
+  text-decoration: none;
+  color: black;
+  font-size: 1.3rem;
+
+  margin-left: -1rem;
+  margin-top: -0.6rem;
+}
+
+#login_nav_btn:hover,
+#signup_nav_btn:hover {
+  color: var(--color-button);
+}
+
+/* *************** */
+/* Content */
+/* *************** */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 85vh;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1rem;
+}
+
+.icon {
+  display: inline-block;
+  width: 8rem;
+  height: 8rem;
+  fill: currentColor;
+}
+/* ****************** */
+/* TOPICS */
+/* ***************** */
+
+.topics_btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  row-gap: 40px;
+}
+
+ul {
+  list-style-type: none;
+}
+
+input.chk-btn {
+  display: none;
+}
+
+input.chk-btn + label {
+  background-color: var(--color-button);
+  display: inline-block;
+  cursor: pointer;
+  color: white;
+  font-size: 1.3rem;
+  padding: 8px 15px;
+  text-decoration: none;
+  border-radius: 5px;
+}
+
+input.chk-btn:not(:checked) + label:hover {
+  background-color: var(--color-button-dark);
+  color: white;
+}
+
+input.chk-btn + label:active,
+input.chk-btn:checked + label {
+  background-color: #ff4500;
+  border: none;
+  font-size: 1.3rem;
+  color: white;
+}
+
+.submit_btn_form {
+  border: 1px solid var(--color-button);
+  cursor: pointer;
+  padding: 10px 35px;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 1.3rem;
+  background-color: var(--color-primary);
+}
+
+.submit_btn_form:hover {
+  background-color: var(--color-button);
+  border-radius: 5px;
+}
+
+/********************************** */
+/* POSTS */
+/********************************** */
+
+.posts {
+  width: 80%;
+}
+.hottest_posts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 20px;
+}
+.hottest_posts_links {
+  font-size: 16px;
+  font-family: 'Roboto Mono', monospace;
+  color: black;
+  text-decoration: none;
+}
+
+.hottest_posts_links:hover {
+  color: #ff4500;
+}
+
+.posts_lists {
+  text-transform: uppercase;
+  color: #ff4500;
+  font-size: 1.5rem;
+  padding: 0 10px;
+}
+/***********************/
+/* LOGIN/SUNGUP FORMS */
+/**********************/
+
+.signup_form,
+.login_form {
+  display: flex;
+  width: 40%;
+  height: 80%;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 30px;
+}
+
+.signup_form input,
+.login_form input {
+  width: 80%;
+  height: 40px;
+  border: none;
+  background-color: rgb(236, 248, 229);
+  text-indent: 10px;
+  border-radius: 5px;
+}
+
+.form_span_link {
+  font-family: 'Roboto Mono', monospace;
+  color: var(--color-button);
+  font-size: 13px;
+}
+.form_span_link:hover {
+  font-family: 'Roboto Mono', monospace;
+  color: var(--color-button);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.form_span_text {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 13px;
+}
+
+.submit_btn {
+  background-color: var(--color-button);
+  color: white;
+  cursor: pointer;
+  padding: 13px 35px;
+  text-decoration: none;
+  border-radius: 28px;
+  border: none;
+  font-size: 1.3rem;
+}
+
+.submit_btn:hover {
+  background-color: var(--color-button-dark);
+  border-radius: 28px;
+}
+
+/**************************************/
+/**************************************/
+
+@media only screen and (max-width: 1100px) {
+  h1 {
+    font-size: 1.6rem;
+    text-align: center;
+  }
+  .icon {
+    width: 7rem;
+    height: 7rem;
+  }
+
+  .signup_form,
+  .login_form {
+    width: 70%;
+  }
+
+  input.chk-btn + label {
+    font-size: 1rem;
+    padding: 8px 10px;
+  }
+  input.chk-btn + label:active,
+  input.chk-btn:checked + label {
+    font-size: 1rem;
+    padding: 8px 10px;
+  }
+
+  .posts_lists {
+    font-size: 1.2rem;
+    text-align: center;
+  }
+}
+
+@media only screen and (max-width: 890px) {
+  h1 {
+    font-size: 1.8rem;
+    text-align: center;
+  }
+
+  h2 {
+    font-size: 0.9rem;
+  }
+
+  .icon {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .nav_link {
+    padding: 10px 20px;
+    font-size: 1.3rem;
+  }
+  body {
+    padding: 25px;
+  }
+  #signup_nav_btn {
+    display: none;
+  }
+  .form_span_text {
+    text-align: center;
+    font-size: 11px;
+  }
+  .topics {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-flow: column wrap;
+  }
+
+  .topics_btn {
+    row-gap: 20px;
+  }
+
+  .posts_lists {
+    font-size: 1.2rem;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .nav_link {
+    padding: 10px 20px;
+    font-size: 1.3rem;
+  }
+
+  h2 {
+    font-size: 0.8rem;
+    text-align: center;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .nav_link {
+    padding: 8px 7px;
+    font-size: 1rem;
+  }
+
+  .nav-left {
+    margin-left: 0.7rem;
+  }
+
+  .nav_name {
+    font-size: 1rem;
+    margin-top: -0.4rem;
+    margin-left: -0.5rem;
+  }
+
+  body {
+    padding: 10px;
+  }
+  .container {
+    gap: 2rem;
+  }
+}
