@@ -1,5 +1,3 @@
-"""Models for Reddit Newsletters."""
-
 import datetime
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -11,16 +9,16 @@ db = SQLAlchemy()
 
 
 class UserTopic(db.Model):
-    """Blog post."""
-
+    """Mapping users to topics."""
+   
     __tablename__ = "users_topics"
-
+   
     user_id = db.Column(
         db.Integer,
         db.ForeignKey('users.id'),
         primary_key=True
     )
-
+    
     topic_id = db.Column(
     db.Integer,
     db.ForeignKey('topics.id'),
@@ -28,6 +26,8 @@ class UserTopic(db.Model):
     )
 
 class TopicSubreddit(db.Model):
+    """Mapping topics to subreddits."""
+    
 
     __tablename__ = "topics_subreddits"
 
@@ -45,7 +45,7 @@ class TopicSubreddit(db.Model):
 
 
 class Topic(db.Model):
-    """Blog post."""
+    """Available topics."""
 
     __tablename__ = "topics"
 
@@ -57,6 +57,7 @@ class Topic(db.Model):
 
 
 class Subreddit(db.Model):
+    """Available subreddits"""
 
     __tablename__ = 'subreddits'
 
@@ -78,7 +79,7 @@ class Subreddit(db.Model):
     )
 
 class Post(db.Model):
-    """Blog post."""
+    """An individual daily posts."""
 
     __tablename__ = "posts"
 
@@ -104,14 +105,9 @@ class Post(db.Model):
        
     )
 
-    @property
-    def formated_date(self):
-        """Return formated date."""
-
-        return self.date.strftime("%b %-d  %Y, %-I:%M %p")
 
 class HotPost(db.Model):
-    """Blog post."""
+    """An individual weekly posts."""
 
     __tablename__ = "hottest_posts"
 
@@ -135,14 +131,8 @@ class HotPost(db.Model):
         
     )
 
-    @property
-    def formated_date(self):
-        """Return formated date."""
-
-        return self.date.strftime("%b %-d  %Y")
-
 class User(UserMixin, db.Model):
-    """Users"""
+    """User in the system."""
 
     __tablename__ = "users"
 
@@ -201,6 +191,8 @@ class User(UserMixin, db.Model):
 
 @login.user_loader
 def load_user(id):
+    """reload the user object from the user ID stored in the session."""
+    
     return User.query.get(int(id))
 
 

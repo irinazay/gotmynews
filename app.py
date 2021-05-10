@@ -58,8 +58,10 @@ def signup():
             return redirect("/topics")
 
         flash('A user already exists with that email address.')
+        return render_template('users/signup.html', form=form)
 
-    return render_template('users/signup.html', form=form)
+    else:
+        return render_template('users/signup.html', form=form)
 
 
 @app.route('/login', methods=["GET", "POST"])
@@ -72,16 +74,19 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
+
         user = User.query.filter_by(email=form.email.data).first()
 
         if user and user.check_password(password=form.password.data):
             login_user(user)
             flash(f"Hello, {user.first_name}!")
             return redirect('/posts')
-
-        flash("Invalid email/password")
-
-    return render_template('users/login.html', form=form)
+        else:
+            flash("Invalid email/password")
+            return render_template('users/login.html', form=form)
+            
+    else:
+        return render_template('users/login.html', form=form)
 
 
 @app.route('/logout')
@@ -94,7 +99,7 @@ def logout():
 @app.route('/topics', methods=['POST', 'GET'])
 @login_required
 def show_topics():
-    """Show all topics"""
+    """Show all available topics"""
     
     if request.method == 'POST':
 
@@ -112,7 +117,7 @@ def show_topics():
                 db.session.add(user_topic)
                 db.session.commit()
 
-                return redirect('/posts')
+            return redirect('/posts')
 
         flash("Pick at least one topic")
         return redirect('/topics')
