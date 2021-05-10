@@ -9,7 +9,7 @@ app = Flask(__name__)
 login.init_app(app)
 login.login_view = 'login'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql:///reddit"
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', "postgresql:///reddit")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'gotmynews1')
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
