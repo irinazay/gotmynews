@@ -26,82 +26,82 @@ else:
 
 
 
-# Requesting a new access token using a refresh token
-# REDDIT_REFRESH_TOKEN = os.environ.get('REDDIT_REFRESH_TOKEN')
-# USER_CREDENTIALS = os.environ.get('USER_CREDENTIALS')
+Requesting a new access token using a refresh token
+REDDIT_REFRESH_TOKEN = os.environ.get('REDDIT_REFRESH_TOKEN')
+USER_CREDENTIALS = os.environ.get('USER_CREDENTIALS')
 
-# resp = requests.post('https://www.reddit.com/api/v1/access_token', 
-# headers={'Authorization': f'Basic {USER_CREDENTIALS}',
-# 'User-Agent': 'macOS:BZNskmtfWcf3Ug:v0.0.1 (by /u/Wonderful_Force_8506)'},
-# params={"grant_type": "refresh_token", "refresh_token": REDDIT_REFRESH_TOKEN})
+resp = requests.post('https://www.reddit.com/api/v1/access_token', 
+headers={'Authorization': f'Basic {USER_CREDENTIALS}',
+'User-Agent': 'macOS:BZNskmtfWcf3Ug:v0.0.1 (by /u/Wonderful_Force_8506)'},
+params={"grant_type": "refresh_token", "refresh_token": REDDIT_REFRESH_TOKEN})
 
-# data = resp.json()
-# refresh_token = data['access_token']
+data = resp.json()
+refresh_token = data['access_token']
 
 
-# # Making daily requests to reddit's API to get one hot post per every predetermed subreddit
-# sub = Subreddit.query.all()
-# subreddits = [s.url for s in sub]
-# for subreddit in subreddits:
+# Making daily requests to reddit's API to get one hot post per every predetermed subreddit
+sub = Subreddit.query.all()
+subreddits = [s.url for s in sub]
+for subreddit in subreddits:
         
-#         resp = requests.get(f"https://oauth.reddit.com/{subreddit}/new", 
-#         headers={'Authorization': f'Bearer {refresh_token}',
-#         'User-Agent': 'macOS:BZNskmtfWcf3Ug:v0.0.1 (by /u/Wonderful_Force_8506)'},
-#         params={"limit": 1})
+        resp = requests.get(f"https://oauth.reddit.com/{subreddit}/new", 
+        headers={'Authorization': f'Bearer {refresh_token}',
+        'User-Agent': 'macOS:BZNskmtfWcf3Ug:v0.0.1 (by /u/Wonderful_Force_8506)'},
+        params={"limit": 1})
 
         
-#         data = resp.json()
+        data = resp.json()
 
-#         score = data['data']['children'][0]['data']['score']
-#         title = data['data']['children'][0]['data']['title']
-#         url = data['data']['children'][0]['data']['permalink']
+        score = data['data']['children'][0]['data']['score']
+        title = data['data']['children'][0]['data']['title']
+        url = data['data']['children'][0]['data']['permalink']
 
-#         sub = Subreddit.query.filter_by(url=f"{subreddit}").one()
+        sub = Subreddit.query.filter_by(url=f"{subreddit}").one()
 
-#         post = Post(
-#             score=score,
-#             url=url,
-#             title=title,
-#             subreddit_id=sub.id       
-#         )
+        post = Post(
+            score=score,
+            url=url,
+            title=title,
+            subreddit_id=sub.id       
+        )
 
-#         db.session.add(post)
-#         time.sleep(5)
+        db.session.add(post)
+        time.sleep(5)
 
-#         db.session.commit()
-
-
+        db.session.commit()
 
 
-# # Every friday get post with max score per every subreddit and add to HotPost
-# sub = Subreddit.query.all()
-# subreddit_ids = [s.id for s in sub]
 
-# for sub_id in subreddit_ids:
 
-#     hottest_post_by_subreddit_id = Post.query.filter_by(subreddit_id = f"{sub_id}").order_by(Post.score.desc()).limit(1).one()
+# Every friday get post with max score per every subreddit and add to HotPost
+sub = Subreddit.query.all()
+subreddit_ids = [s.id for s in sub]
+
+for sub_id in subreddit_ids:
+
+    hottest_post_by_subreddit_id = Post.query.filter_by(subreddit_id = f"{sub_id}").order_by(Post.score.desc()).limit(1).one()
     
 
-#     top = TopicSubreddit.query.filter_by(subreddit_id=f"{sub_id}").one()
-#     title = hottest_post_by_subreddit_id.title
-#     url = hottest_post_by_subreddit_id.url
+    top = TopicSubreddit.query.filter_by(subreddit_id=f"{sub_id}").one()
+    title = hottest_post_by_subreddit_id.title
+    url = hottest_post_by_subreddit_id.url
     
 
-#     hot_post = HotPost(
-#         url=url,
-#         title=title,
-#         topic_id=top.topic_id       
-#     )
+    hot_post = HotPost(
+        url=url,
+        title=title,
+        topic_id=top.topic_id       
+    )
 
-#     db.session.add(hot_post)
-#     db.session.commit()
+    db.session.add(hot_post)
+    db.session.commit()
   
 
   
-# posts = Post.query.all()
-# for post in posts:
-#     db.session.delete(post)
-#     db.session.commit()
+posts = Post.query.all()
+for post in posts:
+    db.session.delete(post)
+    db.session.commit()
 
 
 
