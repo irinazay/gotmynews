@@ -3,6 +3,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from models import login, db, connect_db, User, Topic, UserTopic, Post, Subreddit, TopicSubreddit, HotPost
 from forms import LoginForm,  SignupForm
 from flask_login import current_user, login_user, login_required, logout_user
+import os
 
 app = Flask(__name__)
 login.init_app(app)
@@ -10,7 +11,7 @@ login.login_view = 'login'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql:///reddit"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'secret'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'gotmynews1')
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 toolbar = DebugToolbarExtension(app)
