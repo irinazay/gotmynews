@@ -26,7 +26,7 @@ else:
 
 
 
-Requesting a new access token using a refresh token
+# Requesting a new access token using a refresh token
 REDDIT_REFRESH_TOKEN = os.environ.get('REDDIT_REFRESH_TOKEN')
 USER_CREDENTIALS = os.environ.get('USER_CREDENTIALS')
 
