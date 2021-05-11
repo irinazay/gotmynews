@@ -1,9 +1,11 @@
+
 from models import db, connect_db, User, Topic, UserTopic, Post, Subreddit, TopicSubreddit, HotPost
 from app import app
 import requests
 import time
 from sqlalchemy import desc
 from dotenv import load_dotenv
+from flask_script import Manager
 
 # using SendGrid's Python Library https://github.com/sendgrid/sendgrid-python
 import os
@@ -14,6 +16,8 @@ import ssl
 
 # take environment variables from .env.
 load_dotenv()
+# define script commands
+manager = Manager(app)
 
 try:
     _create_unverified_https_context = ssl._create_unverified_context
@@ -25,24 +29,25 @@ else:
     ssl._create_default_https_context = _create_unverified_https_context
 
 
+@manager.command
+def posts():
+    # Requesting a new access token using a refresh token
+    REDDIT_REFRESH_TOKEN = os.environ.get('REDDIT_REFRESH_TOKEN')
+    USER_CREDENTIALS = os.environ.get('USER_CREDENTIALS')
 
-# Requesting a new access token using a refresh token
-REDDIT_REFRESH_TOKEN = os.environ.get('REDDIT_REFRESH_TOKEN')
-USER_CREDENTIALS = os.environ.get('USER_CREDENTIALS')
+    resp = requests.post('https://www.reddit.com/api/v1/access_token', 
+    headers={'Authorization': f'Basic {USER_CREDENTIALS}',
+    'User-Agent': 'macOS:BZNskmtfWcf3Ug:v0.0.1 (by /u/Wonderful_Force_8506)'},
+    params={"grant_type": "refresh_token", "refresh_token": REDDIT_REFRESH_TOKEN})
 
-resp = requests.post('https://www.reddit.com/api/v1/access_token', 
-headers={'Authorization': f'Basic {USER_CREDENTIALS}',
-'User-Agent': 'macOS:BZNskmtfWcf3Ug:v0.0.1 (by /u/Wonderful_Force_8506)'},
-params={"grant_type": "refresh_token", "refresh_token": REDDIT_REFRESH_TOKEN})
-
-data = resp.json()
-refresh_token = data['access_token']
+    data = resp.json()
+    refresh_token = data['access_token']
 
 
-# Making daily requests to reddit's API to get one hot post per every predetermed subreddit
-sub = Subreddit.query.all()
-subreddits = [s.url for s in sub]
-for subreddit in subreddits:
+    # Making daily requests to reddit's API to get one hot post per every predetermed subreddit
+    sub = Subreddit.query.all()
+    subreddits = [s.url for s in sub]
+    for subreddit in subreddits:
         
         resp = requests.get(f"https://oauth.reddit.com/{subreddit}/new", 
         headers={'Authorization': f'Bearer {refresh_token}',
@@ -71,47 +76,47 @@ for subreddit in subreddits:
         db.session.commit()
 
 
-
-
+@manager.command
+def emails():
 # Every friday get post with max score per every subreddit and add to HotPost
-sub = Subreddit.query.all()
-subreddit_ids = [s.id for s in sub]
+    sub = Subreddit.query.all()
+    subreddit_ids = [s.id for s in sub]
 
-for sub_id in subreddit_ids:
+    for sub_id in subreddit_ids:
 
-    hottest_post_by_subreddit_id = Post.query.filter_by(subreddit_id = f"{sub_id}").order_by(Post.score.desc()).limit(1).one()
+        hottest_post_by_subreddit_id = Post.query.filter_by(subreddit_id = f"{sub_id}").order_by(Post.score.desc()).limit(1).one()
     
 
-    top = TopicSubreddit.query.filter_by(subreddit_id=f"{sub_id}").one()
-    title = hottest_post_by_subreddit_id.title
-    url = hottest_post_by_subreddit_id.url
+        top = TopicSubreddit.query.filter_by(subreddit_id=f"{sub_id}").one()
+        title = hottest_post_by_subreddit_id.title
+        url = hottest_post_by_subreddit_id.url
     
 
-    hot_post = HotPost(
+        hot_post = HotPost(
         url=url,
         title=title,
         topic_id=top.topic_id       
-    )
+        )
 
-    db.session.add(hot_post)
-    db.session.commit()
+        db.session.add(hot_post)
+        db.session.commit()
   
 
   
-posts = Post.query.all()
-for post in posts:
-    db.session.delete(post)
-    db.session.commit()
+    posts = Post.query.all()
+    for post in posts:
+        db.session.delete(post)
+        db.session.commit()
 
 
 
-users = User.query.all()
-for user in users:
+    users = User.query.all()
+    for user in users:
     
-    user_topics = user.topics
-    user_topic_ids = [t.id for t in user_topics]
-    posts = HotPost.query.filter(HotPost.topic_id.in_(user_topic_ids)).order_by(HotPost.date.desc()).limit(9).all()
-    html_text = """
+        user_topics = user.topics
+        user_topic_ids = [t.id for t in user_topics]
+        posts = HotPost.query.filter(HotPost.topic_id.in_(user_topic_ids)).order_by(HotPost.date.desc()).limit(9).all()
+        html_text = """
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html data-editor-version="2" class="sg-campaigns" xmlns="http://www.w3.org/1999/xhtml">
     <head>
@@ -155,10 +160,10 @@ for user in users:
   <div style="font-size:17px; font-family: 'Roboto Mono', monospace; ">
   <ul>"""
 
-    for post in posts:
-      html_text += "<li style='margin: 15px;'><a href='" 'http://reddit.com' + post.url + "'>" + post.title + "</a></li>"  
+        for post in posts:
+            html_text += "<li style='margin: 15px;'><a href='" 'http://reddit.com' + post.url + "'>" + post.title + "</a></li>"  
 
-    html_text += """
+        html_text += """
  </ul>
  </div>
 
@@ -181,20 +186,22 @@ for user in users:
     </body>
   </html>"""
 
-    sendgrid_client = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
-    from_email = From("noreply@irinazaytseva.com", 'Gotmynews')
-    to_email = To(f"{user.email}")
-    subject = Subject("Your weekly posts")
-    html_content = HtmlContent(html_text)
+        sendgrid_client = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+        from_email = From("noreply@irinazaytseva.com", 'Gotmynews')
+        to_email = To(f"{user.email}")
+        subject = Subject("Your weekly posts")
+        html_content = HtmlContent(html_text)
 
-    message = Mail(from_email, to_email, subject, html_content)
+        message = Mail(from_email, to_email, subject, html_content)
 
-    try: 
-      response = sendgrid_client.send(message=message)
-      print(response.status_code)
-      print(response.body)
-      print(response.headers)
-    except urllib.HTTPError as e:
-      print(e.read())
-      exit()
+        try: 
+            response = sendgrid_client.send(message=message)
+            print(response.status_code)
+            print(response.body)
+            print(response.headers)
+        except urllib.HTTPError as e:
+            print(e.read())
+            exit()
 
+if __name__ == "__main__":
+    manager.run()
