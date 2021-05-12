@@ -80,7 +80,6 @@ def login():
 
         if user and user.check_password(password=form.password.data):
             login_user(user)
-            flash(f"Hello, {user.first_name}!")
             return redirect('/posts')
         else:
             flash("Invalid email/password")
@@ -134,6 +133,12 @@ def posts():
     cur_user_topics = cur_user.topics
     cur_user_topic_ids = [t.id for t in cur_user_topics]
 
-    posts = HotPost.query.filter(HotPost.topic_id.in_(cur_user_topic_ids)).order_by(HotPost.date.desc()).limit(9).all()
+    if len(cur_user_topic_ids) is not 0:
 
-    return render_template('posts.html', posts=posts)
+        posts = HotPost.query.filter(HotPost.topic_id.in_(cur_user_topic_ids)).order_by(HotPost.date.desc()).limit(9).all()
+
+        return render_template('posts.html', posts=posts)
+
+
+    return redirect('/topics')
+

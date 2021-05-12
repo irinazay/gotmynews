@@ -23,7 +23,7 @@ body {
 }
 
 .content {
-  max-width: 120rem;
+  max-width: 200rem;
   background-color: var(--color-primary);
 }
 
