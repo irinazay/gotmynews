@@ -1,7 +1,7 @@
 :root {
   --color-primary: rgb(195, 245, 60);
   --color-primary-dark: rgb(180, 241, 11);
-  --color-button: rgb(0, 200, 5);
+  --color-button: rgb(43, 192, 22);
   --color-button-dark: rgba(3, 173, 9, 0.822);
   --color-icon: rgb(255, 69, 0);
 }
@@ -116,10 +116,6 @@ h2 {
   row-gap: 40px;
 }
 
-ul {
-  list-style-type: none;
-}
-
 input.chk-btn {
   display: none;
 }
@@ -193,6 +189,14 @@ input.chk-btn:checked + label {
   padding: 0 10px;
 }
 
+ul {
+  list-style-type: none;
+}
+
+.angle_bracket {
+  font-size: 1rem;
+  color: rgb(255, 69, 0);
+}
 /***********************/
 /* LOGIN/SUNGUP FORMS */
 /**********************/
