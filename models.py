@@ -91,8 +91,6 @@ class Post(db.Model):
 
     url = db.Column(db.Text)
 
-    score = db.Column(db.Integer)
-
     date = db.Column(
         db.DateTime,
         default=datetime.datetime.now)
@@ -106,30 +104,6 @@ class Post(db.Model):
     )
 
 
-class HotPost(db.Model):
-    """An individual weekly posts."""
-
-    __tablename__ = "hottest_posts"
-
-    id = db.Column(db.Integer,
-    primary_key=True
-    )
-
-    title = db.Column(db.Text)
-
-    url = db.Column(db.Text)
-
-    date = db.Column(
-        db.DateTime,
-        default=datetime.datetime.now)
-
-    topic_id = db.Column(db.Integer, db.ForeignKey('topics.id'))
-
-    topics = db.relationship(
-        "Topic",
-        backref="hottest_posts", 
-        
-    )
 
 class User(UserMixin, db.Model):
     """User in the system."""
@@ -202,3 +176,4 @@ def connect_db(app):
 
     db.app = app
     db.init_app(app)
+
