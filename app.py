@@ -1,6 +1,6 @@
 from flask import Flask, request, redirect, render_template, flash
 from flask_debugtoolbar import DebugToolbarExtension
-from models import login, db, connect_db, User, Topic, UserTopic, Post, Subreddit, TopicSubreddit, HotPost
+from models import login, db, connect_db, User, Topic, UserTopic, Post, Subreddit, TopicSubreddit
 from forms import LoginForm,  SignupForm
 from flask_login import current_user, login_user, login_required, logout_user
 import os
@@ -42,13 +42,15 @@ def signup():
     form = SignupForm()
 
     if form.validate_on_submit():
-        existing_user = User.query.filter_by(email=form.email.data).first()
+        email_lowercase = (form.email.data).strip().lower()
+
+        existing_user = User.query.filter_by(email=email_lowercase).first()
 
         if existing_user is None:
             user = User(
                 first_name=form.firstname.data,
                 last_name=form.lastname.data,
-                email=form.email.data,
+                email=email_lowercase,
                 
             )
 
@@ -76,7 +78,8 @@ def login():
 
     if form.validate_on_submit():
 
-        user = User.query.filter_by(email=form.email.data).first()
+        email_lowercase = (form.email.data).strip().lower()
+        user = User.query.filter_by(email=email_lowercase).first()
 
         if user and user.check_password(password=form.password.data):
             login_user(user)
@@ -131,14 +134,18 @@ def posts():
 
     cur_user = User.query.get(f"{current_user.id}")
     cur_user_topics = cur_user.topics
-    cur_user_topic_ids = [t.id for t in cur_user_topics]
 
-    if len(cur_user_topic_ids) is not 0:
-
-        posts = HotPost.query.filter(HotPost.topic_id.in_(cur_user_topic_ids)).order_by(HotPost.date.desc()).limit(9).all()
-
+    if len(cur_user_topics) is not 0:
+        
+        posts = []
+        
+        for cur_user_topic in cur_user_topics:
+            cur_user_subreddits = cur_user_topic.subreddits
+            cur_user_subreddits_ids = [s.id for s in cur_user_subreddits]
+            post = Post.query.filter(Post.subreddit_id.in_(cur_user_subreddits_ids)).order_by(Post.date.desc()).limit(9).all()
+            posts.append(post[0])
+            
         return render_template('posts.html', posts=posts)
-
 
     return redirect('/topics')
 
