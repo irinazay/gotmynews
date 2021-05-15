@@ -1,5 +1,5 @@
 
-from models import db, connect_db, User, Topic, UserTopic, Post, Subreddit, TopicSubreddit, HotPost
+from models import db, connect_db, User, Topic, UserTopic, Post, Subreddit, TopicSubreddit
 from app import app
 import requests
 import time
@@ -49,22 +49,20 @@ def posts():
     subreddits = [s.url for s in sub]
     for subreddit in subreddits:
         
-        resp = requests.get(f"https://oauth.reddit.com/{subreddit}/new", 
+        resp = requests.get(f"https://oauth.reddit.com/{subreddit}/top", 
         headers={'Authorization': f'Bearer {refresh_token}',
         'User-Agent': 'macOS:BZNskmtfWcf3Ug:v0.0.1 (by /u/Wonderful_Force_8506)'},
-        params={"limit": 1})
+        params={"limit": 1, "t": "week"})
 
         
         data = resp.json()
 
-        score = data['data']['children'][0]['data']['score']
         title = data['data']['children'][0]['data']['title']
         url = data['data']['children'][0]['data']['permalink']
 
         sub = Subreddit.query.filter_by(url=f"{subreddit}").one()
 
         post = Post(
-            score=score,
             url=url,
             title=title,
             subreddit_id=sub.id       
@@ -78,44 +76,19 @@ def posts():
 
 @manager.command
 def emails():
-# Every friday get post with max score per every subreddit and add to HotPost
-    sub = Subreddit.query.all()
-    subreddit_ids = [s.id for s in sub]
-
-    for sub_id in subreddit_ids:
-
-        hottest_post_by_subreddit_id = Post.query.filter_by(subreddit_id = f"{sub_id}").order_by(Post.score.desc()).limit(1).one()
-    
-
-        top = TopicSubreddit.query.filter_by(subreddit_id=f"{sub_id}").one()
-        title = hottest_post_by_subreddit_id.title
-        url = hottest_post_by_subreddit_id.url
-    
-
-        hot_post = HotPost(
-        url=url,
-        title=title,
-        topic_id=top.topic_id       
-        )
-
-        db.session.add(hot_post)
-        db.session.commit()
-  
-
-  
-    posts = Post.query.all()
-    for post in posts:
-        db.session.delete(post)
-        db.session.commit()
-
-
 
     users = User.query.all()
     for user in users:
     
         user_topics = user.topics
-        user_topic_ids = [t.id for t in user_topics]
-        posts = HotPost.query.filter(HotPost.topic_id.in_(user_topic_ids)).order_by(HotPost.date.desc()).limit(9).all()
+        posts= []
+        for user_topic in user_topics:
+          user_subreddits = user_topic.subreddits
+          user_subreddits_ids = [s.id for s in user_subreddits]
+          post = Post.query.filter(Post.subreddit_id.in_(user_subreddits_ids)).order_by(Post.date.desc()).limit(9).all()
+          posts.append(post[0])
+
+
         html_text = """
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html data-editor-version="2" class="sg-campaigns" xmlns="http://www.w3.org/1999/xhtml">
@@ -191,6 +164,7 @@ def emails():
         to_email = To(f"{user.email}")
         subject = Subject("Your weekly posts")
         html_content = HtmlContent(html_text)
+        print(html_content)
 
         message = Mail(from_email, to_email, subject, html_content)
 
