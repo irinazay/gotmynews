@@ -11,7 +11,11 @@
   <ul class="hottest_posts">
     {% for post in posts %}
     <li>
-    <a class="hottest_posts_links" href="http://reddit.com{{post.url}}" target="_blank">{{ post.title }}</a>
+      
+        <span class="angle_bracket">&#12299</span><a class="hottest_posts_links" href="http://reddit.com{{post.url}}" target="_blank">{{ post.title }}</a>
+    
+    
+    
     </li>
     {% endfor %}
   </ul>
