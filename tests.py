@@ -1,6 +1,6 @@
 from unittest import TestCase
 from app import app
-from models import db, User, Post, Topic, UserTopic, Subreddit, TopicSubreddit, HotPost
+from models import db, User, Post, Topic, UserTopic, Subreddit, TopicSubreddit
 from flask_login import current_user
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///reddit_test'
@@ -40,13 +40,10 @@ class UserTestCase(TestCase):
         db.session.add(topic_subreddit)
         db.session.commit()
 
-        post = Post(title="testtitle", url="r/subreddit", score= 55, subreddit_id=self.subreddit_id)
+        post = Post(title="testtitle", url="r/subreddit", subreddit_id=self.subreddit_id)
         db.session.add(post)
         db.session.commit()
        
-        hotpost = HotPost(title="testtitle", url="r/subreddit", topic_id=self.topic_id)
-        db.session.add(hotpost)
-        db.session.commit()
       
 
     def tearDown(self):
