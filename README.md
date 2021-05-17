@@ -22,17 +22,17 @@
 
 1. Subscribe with email  
 <p>
-  <img width="500" src="home.png" alt="home page">
+  <img width="500" src="img/home.png" alt="home page">
 </p>
 
 1. Pick topics
 <p>
-  <img width="500" src="topics.png" alt="posts page">
+  <img width="500" src="img/topics.png" alt="posts page">
 </p>
 
 1. Recieve weekly email digest with top posts from Reddit 
 <p>
-  <img width="500" src="posts.png" alt="posts page">
+  <img width="500" src="img/posts.png" alt="posts page">
 </p>
 <br>
 
