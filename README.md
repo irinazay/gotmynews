@@ -5,11 +5,9 @@
 </h2>
 
 
-<p align="center">Check out the
-  <a src="https://gotmynews.herokuapp.com" >website</a>
-</p>
+<p align="center">Check out the  <a href="https://gotmynews.herokuapp.com">website</a></p>
 
-<p align="center">Made with <img width="15" src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg">  &#124; Built with ❤️</p>
+<p align="center">Made with <img width="20" src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg">  &#124; Built with ❤️</p>
 
 
 
@@ -58,7 +56,7 @@ SENDGRID_API_KEY = ...
 
 After that you will be able to make API requests to Reddit and Sendgrid.  
 
-In order to deploy the project, you can create acount on Heroku and after install add-ons: Heroku Postgres and Heroku Scheduler.
+In order to deploy the project, you can create account on Heroku and after install add-ons: Heroku Postgres and Heroku Scheduler.
 <br>
 
 
