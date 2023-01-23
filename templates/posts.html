@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block body_class %}onboarding{% endblock %}
+
+{% block content %}
+
+
+<p class="posts_lists">Recent Posts you might find valuable based on your interests:</p>
+
+<div class="posts">
+  <ul class="hottest_posts">
+    {% for post in posts %}
+    <li>
+      
+        <span class="angle_bracket">&#12299</span><a class="hottest_posts_links" href="http://reddit.com{{post.url}}" target="_blank">{{ post.title }}</a>
+    
+    
+    
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+
+
+{% endblock %}

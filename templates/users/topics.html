@@ -1,0 +1,50 @@
+{% extends 'base.html' %} {% block body_class %}onboarding{% endblock %} {%
+block content %} {% if current_user.is_authenticated %}
+<h1>Welcome, {{ current_user.first_name }}!</h1>
+{% else %}
+<h1>Welcome!</h1>
+{% endif %}
+<h2>Please select as many topics as you like:</h2>
+
+<div>
+  <form method="POST" class="topics_btn">
+    <div class="topics">
+      <input type="checkbox" value="1" name="user_topic" id="ai" class="chk-btn"
+      {{"checked" if 1 in topics}} />
+      <label for="ai">Artificial Intelligence</label>
+
+      <input type="checkbox" value="2" id="a_&_v_reality" name="user_topic"
+      class="chk-btn" {{"checked" if 2 in topics}} />
+      <label for="a_&_v_reality">Augmented & Virtual Reality</label>
+    </div>
+    <div class="topics">
+      <input type="checkbox" value="3" id="cryptocurrency" name="user_topic"
+      class="chk-btn" {{"checked" if 3 in topics}} />
+      <label for="cryptocurrency">Cryptocurrency</label>
+
+      <input type="checkbox" value="4" id="gaming" name="user_topic"
+      class="chk-btn" {{"checked" if 4 in topics}} />
+      <label for="gaming">Gaming</label>
+
+      <input type="checkbox" value="5" id="iot" name="user_topic"
+      class="chk-btn" {{"checked" if 5 in topics}} />
+      <label for="iot">Internet of Things</label>
+    </div>
+    <div class="topics">
+      <input type="checkbox" value="7" id="technology" name="user_topic"
+      class="chk-btn" {{"checked" if 7 in topics}} />
+      <label for="technology">Technology</label>
+
+      <input type="checkbox" value="9" id="web_dev" name="user_topic"
+      class="chk-btn" {{"checked" if 9 in topics}} />
+      <label for="web_dev">Web Dev</label>
+    </div>
+    {% if current_user.is_authenticated %}
+    <button class="submit_btn_form" type="submit">Continue</button>
+    {% else %}
+    <button class="submit_btn_form" type="submit">Sign Up Now</button>
+    {% endif %}
+  </form>
+</div>
+
+{% endblock %}
