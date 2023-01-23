@@ -49,6 +49,8 @@ def signup():
         print(email_lowercase)
         existing_user = User.query.filter_by(email=email_lowercase).first()
         
+        if user: 
+            return redirect('/signup')
         if existing_user is None:
             user = User(
                 first_name=form.firstname.data,
@@ -60,9 +62,9 @@ def signup():
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()  # Create new user
-            print("logining user")
-            login_user(user)  # Log in as newly created user
-            print("inserting selected topics")
+            # print("logining user")
+            # login_user(user)  # Log in as newly created user
+            # print("inserting selected topics")
             if len( selected_topics) != 0:
                 for x in range(7):
                     topic = str(x+1)
@@ -85,7 +87,7 @@ def signup():
                         db.session.add(user_topic)
                         db.session.commit()
             
-            return redirect("/user/topics")
+            return redirect("posts")
 
         flash('A user already exists with that email address.')
         return render_template('users/signup.html', form=form)
@@ -111,7 +113,7 @@ def login():
         user = User.query.filter_by(email=email_lowercase).first()
 
         if user and user.check_password(password=form.password.data):
-            login_user(user)
+            # login_user(user)
             return redirect('/posts')
         else:
             flash("Invalid email/password")
