@@ -60,9 +60,8 @@ def signup():
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()  # Create new user
-            # print("logining user")
-            # login_user(user)  # Log in as newly created user
-            # print("inserting selected topics")
+            login_user(user)  # Log in as newly created user
+    
             if len( selected_topics) != 0:
                 for x in range(7):
                     topic = str(x+1)
@@ -111,7 +110,7 @@ def login():
         user = User.query.filter_by(email=email_lowercase).first()
 
         if user and user.check_password(password=form.password.data):
-            # login_user(user)
+            login_user(user)
             return redirect('/posts')
         else:
             flash("Invalid email/password")
