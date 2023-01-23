@@ -87,7 +87,7 @@ def signup():
                         db.session.add(user_topic)
                         db.session.commit()
             
-            return redirect("posts")
+            return redirect("/posts")
 
         flash('A user already exists with that email address.')
         return render_template('users/signup.html', form=form)
