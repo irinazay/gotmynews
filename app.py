@@ -46,6 +46,7 @@ def signup():
     if form.validate_on_submit():
         email_lowercase = (form.email.data).strip().lower()
         print("================================")
+        print(email_lowercase)
         existing_user = User.query.filter_by(email=email_lowercase).first()
         
         if existing_user is None:
@@ -55,11 +56,13 @@ def signup():
                 email=email_lowercase,
                 
             )
-          
+            
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()  # Create new user
+            print("logining user")
             login_user(user)  # Log in as newly created user
+            print("inserting selected topics")
             if len( selected_topics) != 0:
                 for x in range(7):
                     topic = str(x+1)
@@ -81,7 +84,7 @@ def signup():
 
                         db.session.add(user_topic)
                         db.session.commit()
-
+            
             return redirect("/user/topics")
 
         flash('A user already exists with that email address.')
@@ -94,13 +97,14 @@ def signup():
 @app.route('/login', methods=["GET", "POST"])
 def login():
     """Handle user login."""
-
+    print("is current user is authenticated")
+    print(current_user)
     if current_user.is_authenticated:
         return redirect('/posts')
 
     form = LoginForm()
     print("======================")
-    print(form.email)
+    print(form.email.data)
     if form.validate_on_submit():
 
         email_lowercase = (form.email.data).strip().lower()
@@ -145,7 +149,7 @@ def show_topics():
 @login_required
 def posts():
     """Shows weekly hot posts for current user based on their topics"""
-
+    
     curr_user_topics = UserTopic.query.filter_by(user_id=current_user.id,isSelected=True).all()
     subreddit_ids = [s.topic_id for s in curr_user_topics]
     
@@ -168,7 +172,7 @@ def posts():
 @login_required
 def show_users_topics():
     """Show all user's topics"""
-    print("================================")
+    print("================================/user/topics")
     print(current_user)
     curr_user_topics = UserTopic.query.filter_by(user_id=current_user.id,isSelected=True).all()
     topics = [s.topic_id for s in curr_user_topics]
