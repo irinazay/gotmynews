@@ -9,7 +9,7 @@ app = Flask(__name__)
 login.init_app(app)
 login.login_view = 'login'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', "postgres:///reddit").replace("://", "ql://", 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', "postgres:///gotmynews").replace("://", "ql://", 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'gotmynews1')
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
@@ -41,12 +41,13 @@ def signup():
     
     form = SignupForm()
     selected_topics = session['topics']
-
+    print("================================")
+    print(selected_topics)
     if form.validate_on_submit():
         email_lowercase = (form.email.data).strip().lower()
-
+        print("================================")
         existing_user = User.query.filter_by(email=email_lowercase).first()
-
+        
         if existing_user is None:
             user = User(
                 first_name=form.firstname.data,
@@ -54,7 +55,7 @@ def signup():
                 email=email_lowercase,
                 
             )
-
+          
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()  # Create new user
@@ -98,7 +99,8 @@ def login():
         return redirect('/posts')
 
     form = LoginForm()
-
+    print("======================")
+    print(form.email)
     if form.validate_on_submit():
 
         email_lowercase = (form.email.data).strip().lower()
@@ -123,7 +125,6 @@ def logout():
 
 
 @app.route('/topics', methods=['POST', 'GET'])
-# @login_required
 def show_topics():
     """Show all available topics"""
 
@@ -167,6 +168,8 @@ def posts():
 @login_required
 def show_users_topics():
     """Show all user's topics"""
+    print("================================")
+    print(current_user)
     curr_user_topics = UserTopic.query.filter_by(user_id=current_user.id,isSelected=True).all()
     topics = [s.topic_id for s in curr_user_topics]
 
