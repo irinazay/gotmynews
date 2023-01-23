@@ -49,8 +49,6 @@ def signup():
         print(email_lowercase)
         existing_user = User.query.filter_by(email=email_lowercase).first()
         
-        if user: 
-            return redirect('/signup')
         if existing_user is None:
             user = User(
                 first_name=form.firstname.data,
