@@ -40,7 +40,7 @@ def signup():
         return redirect('/posts')
     
     form = SignupForm()
-    selected_topics = session['topics']
+    selected_topics = ['1', '2']
 
     if form.validate_on_submit():
         email_lowercase = (form.email.data).strip().lower()
@@ -82,7 +82,7 @@ def signup():
                         db.session.add(user_topic)
                         db.session.commit()
             
-            return redirect("/login")
+            return redirect("/posts")
 
         flash('A user already exists with that email address.')
         return render_template('users/signup.html', form=form)
@@ -132,7 +132,7 @@ def show_topics():
         topics_ids = request.form.getlist('user_topic')
 
         if len(topics_ids) != 0:
-            session['topics'] = topics_ids
+            # session['topics'] = topics_ids
             return redirect('/signup')
 
         flash("Pick at least one topic")
@@ -161,7 +161,7 @@ def posts():
             
         return render_template('posts.html', posts=posts)
 
-    return redirect('/topics')
+    return redirect('/user/topics')
 
 @app.route('/user/topics', methods=['POST', 'GET'])
 @login_required
