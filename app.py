@@ -40,7 +40,8 @@ def signup():
         return redirect('/posts')
     
     form = SignupForm()
-    selected_topics = ['1', '2']
+    selected_topics = session['topics'] 
+    session.clear()
 
     if form.validate_on_submit():
         email_lowercase = (form.email.data).strip().lower()
@@ -132,7 +133,7 @@ def show_topics():
         topics_ids = request.form.getlist('user_topic')
 
         if len(topics_ids) != 0:
-            # session['topics'] = topics_ids
+            session['topics'] = topics_ids
             return redirect('/signup')
 
         flash("Pick at least one topic")
@@ -174,7 +175,8 @@ def show_users_topics():
     if request.method == 'POST': 
 
         topics_ids = request.form.getlist('user_topic')
-
+        print("_--------------------------_")
+        print(topics_ids)
         if len(topics_ids) != 0:
             for x in range(7):
                 topic = str(x+1)
