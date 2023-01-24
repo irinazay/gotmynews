@@ -41,12 +41,10 @@ def signup():
     
     form = SignupForm()
     selected_topics = session['topics']
-    print("================================")
-    print(selected_topics)
+
     if form.validate_on_submit():
         email_lowercase = (form.email.data).strip().lower()
-        print("================================")
-        print(email_lowercase)
+
         existing_user = User.query.filter_by(email=email_lowercase).first()
         
         if existing_user is None:
@@ -84,7 +82,7 @@ def signup():
                         db.session.add(user_topic)
                         db.session.commit()
             
-            return redirect("/posts")
+            return redirect("/login")
 
         flash('A user already exists with that email address.')
         return render_template('users/signup.html', form=form)
@@ -96,14 +94,12 @@ def signup():
 @app.route('/login', methods=["GET", "POST"])
 def login():
     """Handle user login."""
-    print("is current user is authenticated")
-    print(current_user)
+
     if current_user.is_authenticated:
         return redirect('/posts')
 
     form = LoginForm()
-    print("======================")
-    print(form.email.data)
+
     if form.validate_on_submit():
 
         email_lowercase = (form.email.data).strip().lower()
@@ -171,8 +167,7 @@ def posts():
 @login_required
 def show_users_topics():
     """Show all user's topics"""
-    print("================================/user/topics")
-    print(current_user)
+
     curr_user_topics = UserTopic.query.filter_by(user_id=current_user.id,isSelected=True).all()
     topics = [s.topic_id for s in curr_user_topics]
 
