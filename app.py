@@ -92,16 +92,19 @@ def signup():
     else:
         return render_template('users/signup.html', form=form)
 
+@login_manager.unauthorized_handler
+def handle_needs_login():
+    return redirect(url_for('login', next_page=request.endpoint))
 
-@app.route('/login', methods=["GET", "POST"])
-def login():
+@app.route('/login/<next_page>', methods=["GET", "POST"])
+def login(next_page):
     """Handle user login."""
 
     if current_user.is_authenticated:
-        dest_url = request.args.get('next')
-        if not dest_url:
-            return redirect('/post')
-        return redirect(dest_url)
+        return redirect(url_for(next_page))
+
+    if is_a_successfull_login():
+        redirect(url_for(next_page))
 
     form = LoginForm()
 
