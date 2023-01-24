@@ -169,7 +169,7 @@ class User(UserMixin, db.Model):
 def load_user(id):
     """reload the user object from the user ID stored in the session."""
     print("_________________user_loader__________________")
-    user = User.query.get(id)
+    user = User.query.get(int(id))
     print(user)
     if user:
         return user
