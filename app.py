@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, flash, session, url_for
+from flask import Flask, request, redirect, render_template, flash, session,
 from flask_debugtoolbar import DebugToolbarExtension
 from models import login, db, connect_db, User, Topic, UserTopic, Post, Subreddit, TopicSubreddit
 from forms import LoginForm,  SignupForm
@@ -60,7 +60,7 @@ def signup():
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()  # Create new user
-            login_user(user,remember=True)  # Log in as newly created user
+            login_user(user)  # Log in as newly created user
     
             if len( selected_topics) != 0:
                 for x in range(7):
@@ -97,8 +97,8 @@ def signup():
 def login():
     """Handle user login."""
 
-    if current_user.is_authenticated:
-        return redirect('/posts')
+    # if current_user.is_authenticated:
+    #     return redirect('/posts')
 
 
     form = LoginForm()
@@ -109,10 +109,9 @@ def login():
         user = User.query.filter_by(email=email_lowercase).first()
 
         if user and user.check_password(password=form.password.data):
-            login_user(user,remember=True)
-            if next_url:
-                return redirect(next_url)
-            return redirect(url_for("posts"))
+            login_user(user)
+            return redirect("/posts")
+
         else:
             flash("Invalid email/password")
             return render_template('users/login.html', form=form)
@@ -166,8 +165,9 @@ def posts():
                 posts.append(post[0])
             
         return render_template('users/posts.html', posts=posts)
-
-    return redirect('/selected-topics')
+    if current_user.is_authenticated:
+        return redirect('/selected-topics')
+    return redirect('/')
 
 @app.route('/selected-topics', methods=['POST', 'GET'])
 @login_required
@@ -194,6 +194,7 @@ def show_users_topics():
                     user_topic =  UserTopic.query.filter_by(user_id=current_user.id, topic_id=x+1).one()
                     user_topic.isSelected = False 
                     db.session.commit() 
-
-        return redirect(url_for('posts'))
+        if current_user.is_authenticated:
+            return redirect('/posts')
+        return redirect('/')
     return render_template('users/selected-topics.html',topics=topics)
