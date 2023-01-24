@@ -40,8 +40,7 @@ def signup():
         return redirect('/posts')
     
     form = SignupForm()
-    selected_topics = session['topics'] 
-    session.clear()
+    selected_topics = session['topics']
 
     if form.validate_on_submit():
         email_lowercase = (form.email.data).strip().lower()
@@ -56,6 +55,7 @@ def signup():
                 
             )
             
+            session.pop('topics', None)
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()  # Create new user
