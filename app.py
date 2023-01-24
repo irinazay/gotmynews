@@ -143,10 +143,11 @@ def show_topics():
     return render_template('users/topics.html')
 
 @app.route('/posts')
-# @login_required
+@login_required
 def posts():
     """Shows weekly hot posts for current user based on their topics"""
-    
+    print("post")
+    print(current_user.is_authenticated)
     curr_user_topics = UserTopic.query.filter_by(user_id=current_user.id,isSelected=True).all()
     subreddit_ids = [s.topic_id for s in curr_user_topics]
     
@@ -166,10 +167,11 @@ def posts():
     return redirect('/user/topics')
 
 @app.route('/user/topics', methods=['POST', 'GET'])
-# @login_required
+@login_required
 def show_users_topics():
     """Show all user's topics"""
-
+    print("users_topics")
+    print(current_user.is_authenticated)
     curr_user_topics = UserTopic.query.filter_by(user_id=current_user.id,isSelected=True).all()
     topics = [s.topic_id for s in curr_user_topics]
 
