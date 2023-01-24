@@ -98,7 +98,10 @@ def login():
     """Handle user login."""
 
     if current_user.is_authenticated:
-        return redirect('/posts')
+        dest_url = request.args.get('next')
+        if not dest_url:
+            return redirect('/post')
+        return redirect(dest_url)
 
     form = LoginForm()
 
