@@ -165,9 +165,8 @@ def posts():
                 posts.append(post[0])
             
         return render_template('users/posts.html', posts=posts)
-    if current_user.is_authenticated:
-        return redirect('/selected-topics')
     return redirect('/')
+
 
 @app.route('/selected-topics', methods=['POST', 'GET'])
 @login_required
@@ -194,7 +193,7 @@ def show_users_topics():
                     user_topic =  UserTopic.query.filter_by(user_id=current_user.id, topic_id=x+1).one()
                     user_topic.isSelected = False 
                     db.session.commit() 
-        if current_user.is_authenticated:
-            return redirect('/posts')
-        return redirect('/')
+
+        return redirect('/posts')
+
     return render_template('users/selected-topics.html',topics=topics)

@@ -166,12 +166,12 @@ class User(UserMixin, db.Model):
 
 
 @login.user_loader
-def load_user(user_id):
+def load_user(id):
     """reload the user object from the user ID stored in the session."""
-    print(user_id)
-    user = User.query.filter_by(id=int(user_id)).first()
+    print("_________________user_loader__________________")
+    user = User.query.get(id)
+    print(user)
     if user:
-        print(user)
         return user
     return None
 
