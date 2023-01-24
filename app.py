@@ -40,7 +40,7 @@ def signup():
         return redirect('/posts')
     
     form = SignupForm()
-    selected_topics = ['1','2']
+    selected_topics = session['topics']
     print(selected_topics)
 
     if form.validate_on_submit():
@@ -56,7 +56,7 @@ def signup():
                 
             )
             
-            # session.pop('topics')
+            session.pop('topics')
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()  # Create new user
@@ -140,7 +140,7 @@ def show_topics():
         flash("Pick at least one topic")
         return redirect('/topics')
         
-    return render_template('users/topics.html')
+    return render_template('topics.html')
 
 @app.route('/posts')
 @login_required
@@ -162,11 +162,11 @@ def posts():
             if len(post) != 0:
                 posts.append(post[0])
             
-        return render_template('posts.html', posts=posts)
+        return render_template('users/posts.html', posts=posts)
 
-    return redirect('/user/topics')
+    return redirect('/users/topics')
 
-@app.route('/user/topics', methods=['POST', 'GET'])
+@app.route('/selected-topics', methods=['POST', 'GET'])
 @login_required
 def show_users_topics():
     """Show all user's topics"""
@@ -193,4 +193,4 @@ def show_users_topics():
                     db.session.commit() 
 
         return redirect('/posts')
-    return render_template('users/topics.html',topics=topics)
+    return render_template('users/selected-topics.html',topics=topics)
