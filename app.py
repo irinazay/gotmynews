@@ -92,19 +92,14 @@ def signup():
     else:
         return render_template('users/signup.html', form=form)
 
-@login_manager.unauthorized_handler
-def handle_needs_login():
-    return redirect(url_for('login', next_page=request.endpoint))
 
-@app.route('/login/<next_page>', methods=["GET", "POST"])
-def login(next_page):
+@app.route('/login', methods=["GET", "POST"])
+def login():
     """Handle user login."""
 
-    if current_user.is_authenticated:
-        return redirect(url_for(next_page))
+    # if current_user.is_authenticated:
+    #     return redirect('/posts')
 
-    if is_a_successfull_login():
-        redirect(url_for(next_page))
 
     form = LoginForm()
 
@@ -115,7 +110,9 @@ def login(next_page):
 
         if user and user.check_password(password=form.password.data):
             login_user(user)
-            return redirect('/posts')
+            if next_url:
+                return redirect(next_url)
+            return redirect(url_for("posts"))
         else:
             flash("Invalid email/password")
             return render_template('users/login.html', form=form)
