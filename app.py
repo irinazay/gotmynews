@@ -26,7 +26,6 @@ db.create_all()
 @app.route('/')
 def root():
     """Show home page"""
-    print(current_user)
     if current_user.is_authenticated:
         return redirect('/posts')
 
@@ -41,7 +40,7 @@ def signup():
         return redirect('/posts')
     
     form = SignupForm()
-    selected_topics = session['topics']
+    selected_topics = ['3','3']
     print(selected_topics)
 
     if form.validate_on_submit():
@@ -57,7 +56,7 @@ def signup():
                 
             )
             
-            session.pop('topics')
+            # session.pop('topics')
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()  # Create new user
@@ -137,7 +136,7 @@ def show_topics():
         topics_ids = request.form.getlist('topic')
 
         if len(topics_ids) != 0:
-            session['topics'] = topics_ids
+            # session['topics'] = topics_ids
             return redirect('/signup')
 
         flash("Pick at least one topic")
@@ -146,61 +145,55 @@ def show_topics():
     return render_template('topics.html')
 
 @app.route('/posts')
-# @login_required
+@login_required
 def posts():
     """Shows weekly hot posts for current user based on their topics"""
-    print(current_user)
-    if not current_user.is_authenticated:
-        flash("Please login")
-        return redirect('/login')
-    if current_user.is_authenticated:
-        curr_user_topics = UserTopic.query.filter_by(user_id=current_user.id,isSelected=True).all()
-        subreddit_ids = [s.topic_id for s in curr_user_topics]
+    print("post")
+    print(current_user.is_authenticated)
+    curr_user_topics = UserTopic.query.filter_by(user_id=current_user.id,isSelected=True).all()
+    subreddit_ids = [s.topic_id for s in curr_user_topics]
     
 
-        if len(subreddit_ids) != 0:
+    if len(subreddit_ids) != 0:
         
-            posts = []
+        posts = []
         
-            for curr_sub_id in subreddit_ids:
+        for curr_sub_id in subreddit_ids:
             
-                post = Post.query.filter_by(subreddit_id=curr_sub_id).order_by(Post.date.desc()).limit(9).all()
-                if len(post) != 0:
-                    posts.append(post[0])
+            post = Post.query.filter_by(subreddit_id=curr_sub_id).order_by(Post.date.desc()).limit(9).all()
+            if len(post) != 0:
+                posts.append(post[0])
             
-            return render_template('users/posts.html', posts=posts)
+        return render_template('users/posts.html', posts=posts)
     return redirect('/')
 
 
 @app.route('/selected-topics', methods=['POST', 'GET'])
-# @login_required
+@login_required
 def show_users_topics():
     """Show all user's topics"""
-    if not current_user.is_authenticated:
-        flash("please login")
-        return redirect("/login")
-    if current_user.is_authenticated:
-        print(current_user)
-        curr_user_topics = UserTopic.query.filter_by(user_id=current_user.id,isSelected=True).all()
-        topics = [s.topic_id for s in curr_user_topics]
+    print("users_topics")
+    print(current_user.is_authenticated)
+    curr_user_topics = UserTopic.query.filter_by(user_id=current_user.id,isSelected=True).all()
+    topics = [s.topic_id for s in curr_user_topics]
 
-        if request.method == 'POST': 
+    if request.method == 'POST': 
 
-            topics_ids = request.form.getlist('selected_topic')
-            print("_--------------------------_")
-            print(topics_ids)
-            if len(topics_ids) != 0:
-                for x in range(7):
-                    topic = str(x+1)
-                    if topic in topics_ids:
-                        user_topic =  UserTopic.query.filter_by(user_id=current_user.id, topic_id=x+1).one()
-                        user_topic.isSelected = True 
-                        db.session.commit()
-                    else:
-                        user_topic =  UserTopic.query.filter_by(user_id=current_user.id, topic_id=x+1).one()
-                        user_topic.isSelected = False 
-                        db.session.commit() 
+        topics_ids = request.form.getlist('selected_topic')
+        print("_--------------------------_")
+        print(topics_ids)
+        if len(topics_ids) != 0:
+            for x in range(7):
+                topic = str(x+1)
+                if topic in topics_ids:
+                    user_topic =  UserTopic.query.filter_by(user_id=current_user.id, topic_id=x+1).one()
+                    user_topic.isSelected = True 
+                    db.session.commit()
+                else:
+                    user_topic =  UserTopic.query.filter_by(user_id=current_user.id, topic_id=x+1).one()
+                    user_topic.isSelected = False 
+                    db.session.commit() 
 
-            return redirect('/posts')
+        return redirect('/posts')
 
-        return render_template('users/selected-topics.html',topics=topics)
+    return render_template('users/selected-topics.html',topics=topics)
