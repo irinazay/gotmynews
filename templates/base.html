@@ -37,7 +37,6 @@
               <ul class="nav-right" id="nav_link">
                 {% if not current_user.is_authenticated %}
                 <li><a class="nav_link" id= "login_nav_btn" href="/login">Log In</a></li>
-                <li><a class="nav_link" id= "signup_nav_btn" href="/signup">Sign Up</a></li>
                 {% else %}
                 <li><a class="nav_link" href="/user/topics">Topics</a></li>
                 <li><a class="nav_link" href="/logout">Log Out</a></li>
