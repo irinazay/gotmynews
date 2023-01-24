@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, flash, session,
+from flask import Flask, request, redirect, render_template, flash, session
 from flask_debugtoolbar import DebugToolbarExtension
 from models import login, db, connect_db, User, Topic, UserTopic, Post, Subreddit, TopicSubreddit
 from forms import LoginForm,  SignupForm
