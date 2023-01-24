@@ -97,8 +97,8 @@ def signup():
 def login():
     """Handle user login."""
 
-    # if current_user.is_authenticated:
-    #     return redirect('/posts')
+    if current_user.is_authenticated:
+        return redirect('/posts')
 
 
     form = LoginForm()
