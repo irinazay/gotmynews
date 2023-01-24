@@ -40,7 +40,7 @@ def signup():
         return redirect('/posts')
     
     form = SignupForm()
-    selected_topics = session['topics']
+    selected_topics = ['1','2']
     print(selected_topics)
 
     if form.validate_on_submit():
@@ -56,7 +56,7 @@ def signup():
                 
             )
             
-            session.pop('topics')
+            # session.pop('topics')
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()  # Create new user
@@ -134,7 +134,7 @@ def show_topics():
         topics_ids = request.form.getlist('user_topic')
 
         if len(topics_ids) != 0:
-            session['topics'] = topics_ids
+            # session['topics'] = topics_ids
             return redirect('/signup')
 
         flash("Pick at least one topic")
