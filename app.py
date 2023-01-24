@@ -131,7 +131,7 @@ def show_topics():
 
     if request.method == 'POST':
 
-        topics_ids = request.form.getlist('user_topic')
+        topics_ids = request.form.getlist('topic')
 
         if len(topics_ids) != 0:
             session['topics'] = topics_ids
@@ -164,7 +164,7 @@ def posts():
             
         return render_template('users/posts.html', posts=posts)
 
-    return redirect('/users/topics')
+    return redirect('/selected-topics')
 
 @app.route('/selected-topics', methods=['POST', 'GET'])
 @login_required
@@ -177,7 +177,7 @@ def show_users_topics():
 
     if request.method == 'POST': 
 
-        topics_ids = request.form.getlist('user_topic')
+        topics_ids = request.form.getlist('selected_topic')
         print("_--------------------------_")
         print(topics_ids)
         if len(topics_ids) != 0:
