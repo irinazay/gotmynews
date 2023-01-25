@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template, flash, session
+from flask import Flask, request, redirect, render_template, flash, session, url_for
 from flask_debugtoolbar import DebugToolbarExtension
 from models import login, db, connect_db, User, Topic, UserTopic, Post, Subreddit, TopicSubreddit
 from forms import LoginForm,  SignupForm
@@ -96,10 +96,9 @@ def signup():
 @app.route('/login', methods=["GET", "POST"])
 def login():
     """Handle user login."""
-
+    print("========================================")
     # if current_user.is_authenticated:
     #     return redirect('/posts')
-
 
     form = LoginForm()
 
@@ -110,7 +109,13 @@ def login():
 
         if user and user.check_password(password=form.password.data):
             login_user(user)
-            return redirect("/posts")
+
+            next = request.args.get('next')
+            print("next")
+            print(next)
+            if next is None:
+                next = '/'
+            return redirect(next)
 
         else:
             flash("Invalid email/password")
