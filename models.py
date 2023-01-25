@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from flask_login import LoginManager
+from flask import  redirect, url_for, request
  
 login = LoginManager()
 db = SQLAlchemy()
@@ -175,7 +176,10 @@ def load_user(id):
         return user
     return None
 
-
+@login.unauthorized_handler
+def handle_needs_login():
+    flash("You have to be logged in to access this page.")
+    return redirect(url_for('login', next=request.endpoint))
 
 def connect_db(app):
     """Connect database to Flask app."""

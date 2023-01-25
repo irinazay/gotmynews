@@ -93,6 +93,15 @@ def signup():
         return render_template('users/signup.html', form=form)
 
 
+
+def redirect_dest(fallback):
+    dest = request.args.get('next')
+    try:
+        dest_url = url_for(dest)
+    except:
+        return redirect(fallback)
+    return redirect(dest_url)
+
 @app.route('/login', methods=["GET", "POST"])
 def login():
     """Handle user login."""
@@ -109,7 +118,7 @@ def login():
 
         if user and user.check_password(password=form.password.data):
             login_user(user)
-            return redirect('/posts')
+            return redirect_dest(fallback=url_for('posts'))
         else:
             flash("Invalid email/password")
             return render_template('users/login.html', form=form)
