@@ -31,12 +31,12 @@ block content %} {% if current_user.is_authenticated %}
       <label for="iot">Internet of Things</label>
     </div>
     <div class="topics">
-      <input type="checkbox" value="7" id="technology" name="selected_topic"
-      class="chk-btn" {{"checked" if 7 in topics}} />
+      <input type="checkbox" value="6" id="technology" name="selected_topic"
+      class="chk-btn" {{"checked" if 6 in topics}} />
       <label for="technology">Technology</label>
 
-      <input type="checkbox" value="9" id="web_dev" name="selected_topic"
-      class="chk-btn" {{"checked" if 9 in topics}} />
+      <input type="checkbox" value="7" id="web_dev" name="selected_topic"
+      class="chk-btn" {{"checked" if 7 in topics}} />
       <label for="web_dev">Web Dev</label>
     </div>
     {% if current_user.is_authenticated %}

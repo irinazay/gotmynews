@@ -40,8 +40,7 @@ def signup():
         return redirect('/posts')
     
     form = SignupForm()
-    selected_topics = session['topics']
-    print(selected_topics)
+    # selected_topics = session['topics']
 
     if form.validate_on_submit():
         email_lowercase = (form.email.data).strip().lower()
@@ -56,51 +55,28 @@ def signup():
                 
             )
             
-            session.pop('topics')
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()  # Create new user
             login_user(user)  # Log in as newly created user
     
-            if len( selected_topics) != 0:
-                for x in range(7):
-                    topic = str(x+1)
 
-                    if topic in selected_topics:
-                        user_topic = UserTopic(
-                        user_id=current_user.id,
-                        topic_id= x+1,
-                        isSelected=True    
+            for x in range(7):
+                user_topic = UserTopic(
+                    user_id=current_user.id,
+                    topic_id= x+1,
+                    isSelected=False   
                 )
-                        db.session.add(user_topic)
-                        db.session.commit()
-                    else:
-                        user_topic = UserTopic(
-                        user_id=current_user.id,
-                        topic_id= x+1,
-                        isSelected=False   
-                )
-
-                        db.session.add(user_topic)
-                        db.session.commit()
+                db.session.add(user_topic)
+                db.session.commit()
             
-            return redirect("/posts")
+            return redirect("/topics")
 
         flash('A user already exists with that email address.')
         return render_template('users/signup.html', form=form)
 
     else:
         return render_template('users/signup.html', form=form)
-
-
-
-def redirect_dest(fallback):
-    dest = request.args.get('next')
-    try:
-        dest_url = url_for(dest)
-    except:
-        return redirect(fallback)
-    return redirect(dest_url)
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
@@ -118,7 +94,7 @@ def login():
 
         if user and user.check_password(password=form.password.data):
             login_user(user)
-            return redirect_dest(fallback=url_for('posts'))
+            return redirect('/posts')
         else:
             flash("Invalid email/password")
             return render_template('users/login.html', form=form)
@@ -135,22 +111,22 @@ def logout():
     return redirect('/')
 
 
-@app.route('/topics', methods=['POST', 'GET'])
-def show_topics():
-    """Show all available topics"""
+# @app.route('/topics', methods=['POST', 'GET'])
+# def show_topics():
+#     """Show all available topics"""
 
-    if request.method == 'POST':
+#     if request.method == 'POST':
 
-        topics_ids = request.form.getlist('topic')
+#         topics_ids = request.form.getlist('topic')
 
-        if len(topics_ids) != 0:
-            session['topics'] = topics_ids
-            return redirect('/signup')
+#         if len(topics_ids) != 0:
+#             session['topics'] = topics_ids
+#             return redirect('/signup')
 
-        flash("Pick at least one topic")
-        return redirect('/topics')
+#         flash("Pick at least one topic")
+#         return redirect('/topics')
         
-    return render_template('topics.html')
+#     return render_template('topics.html')
 
 @app.route('/posts')
 @login_required
@@ -173,10 +149,12 @@ def posts():
                 posts.append(post[0])
             
         return render_template('users/posts.html', posts=posts)
-    return redirect('/')
+
+    print("shdfjldwfbjwehfbqiehrbf;qiwjqefbc")
+    return redirect('/posts')
 
 
-@app.route('/selected-topics', methods=['POST', 'GET'])
+@app.route('/topics', methods=['POST', 'GET'])
 @login_required
 def show_users_topics():
     """Show all user's topics"""
@@ -202,4 +180,4 @@ def show_users_topics():
 
         return redirect('/posts')
 
-    return render_template('users/selected-topics.html',topics=topics)
+    return render_template('users/topics.html',topics=topics)
