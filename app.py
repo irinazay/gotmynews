@@ -40,7 +40,7 @@ def signup():
         return redirect('/posts')
     
     form = SignupForm()
-    selected_topics = ['3','3']
+    selected_topics = session['topics']
     print(selected_topics)
 
     if form.validate_on_submit():
@@ -56,7 +56,7 @@ def signup():
                 
             )
             
-            # session.pop('topics')
+            session.pop('topics')
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()  # Create new user
@@ -96,9 +96,9 @@ def signup():
 @app.route('/login', methods=["GET", "POST"])
 def login():
     """Handle user login."""
-    print("========================================")
-    # if current_user.is_authenticated:
-    #     return redirect('/posts')
+
+    if current_user.is_authenticated:
+        return redirect('/posts')
 
     form = LoginForm()
 
@@ -109,20 +109,14 @@ def login():
 
         if user and user.check_password(password=form.password.data):
             login_user(user)
-
-            next = request.args.get('next')
-            print("next")
-            print(next)
-            if next is None:
-                next = '/'
-            return redirect(next)
-
+            return redirect('/posts')
         else:
             flash("Invalid email/password")
             return render_template('users/login.html', form=form)
             
     else:
         return render_template('users/login.html', form=form)
+
 
 
 @app.route('/logout')
@@ -141,7 +135,7 @@ def show_topics():
         topics_ids = request.form.getlist('topic')
 
         if len(topics_ids) != 0:
-            # session['topics'] = topics_ids
+            session['topics'] = topics_ids
             return redirect('/signup')
 
         flash("Pick at least one topic")
@@ -177,16 +171,14 @@ def posts():
 @login_required
 def show_users_topics():
     """Show all user's topics"""
-    print("users_topics")
-    print(current_user.is_authenticated)
+
     curr_user_topics = UserTopic.query.filter_by(user_id=current_user.id,isSelected=True).all()
     topics = [s.topic_id for s in curr_user_topics]
 
     if request.method == 'POST': 
 
         topics_ids = request.form.getlist('selected_topic')
-        print("_--------------------------_")
-        print(topics_ids)
+
         if len(topics_ids) != 0:
             for x in range(7):
                 topic = str(x+1)
