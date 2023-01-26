@@ -1,13 +1,16 @@
 from flask import Flask, request, redirect, render_template, flash, session, url_for
 from flask_debugtoolbar import DebugToolbarExtension
-from models import login, db, connect_db, User, Topic, UserTopic, Post, Subreddit, TopicSubreddit
+from werkzeug.exceptions import Unauthorized
+from models import db, connect_db, User, Topic, UserTopic, Post, Subreddit, TopicSubreddit
 from forms import LoginForm,  SignupForm
-from flask_login import current_user, login_user, login_required, logout_user
 import os
 
 app = Flask(__name__)
-login.init_app(app)
-login.login_view = 'login'
+
+@app.errorhandler(404)
+def not_found(e):
+  
+  return render_template("404.html"), 404
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', "postgres:///gotmynews").replace("://", "ql://", 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -26,8 +29,9 @@ db.create_all()
 @app.route('/')
 def root():
     """Show home page"""
-    if current_user.is_authenticated:
-        return redirect('/posts')
+
+    if "firstname" in session:
+        return redirect(f"/users/{session['firstname']}/posts")
 
     return render_template('home.html')
 
@@ -36,11 +40,11 @@ def root():
 @app.route('/signup', methods=['POST', 'GET'])
 def signup():
 
-    if current_user.is_authenticated:
-        return redirect('/posts')
+    if "firstname" in session:
+        return redirect(f"/users/{session['firstname']}/posts")
     
     form = SignupForm()
-    # selected_topics = session['topics']
+    selected_topics = session['topics']
 
     if form.validate_on_submit():
         email_lowercase = (form.email.data).strip().lower()
@@ -57,20 +61,31 @@ def signup():
             
             user.set_password(form.password.data)
             db.session.add(user)
+            session.pop("topics")
             db.session.commit()  # Create new user
-            login_user(user)  # Log in as newly created user
+            session['firstname'] = user.first_name  # Log in as newly created user
     
-
-            for x in range(7):
-                user_topic = UserTopic(
-                    user_id=current_user.id,
-                    topic_id= x+1,
-                    isSelected=False   
+            if len( selected_topics) != 0:
+                for x in range(7):
+                    topic = str(x+1)
+                    if topic in selected_topics:
+                        user_topic = UserTopic(
+                        user_id=user.id,
+                        topic_id= x+1,
+                        isSelected=True    
                 )
-                db.session.add(user_topic)
-                db.session.commit()
+                        db.session.add(user_topic)
+                        db.session.commit()
+                    else:
+                        user_topic = UserTopic(
+                        user_id=user.id,
+                        topic_id= x+1,
+                        isSelected=False   
+                )
+                        db.session.add(user_topic)
+                        db.session.commit()
             
-            return redirect("/topics")
+            return redirect(f"/users/{user.first_name}/posts")
 
         flash('A user already exists with that email address.')
         return render_template('users/signup.html', form=form)
@@ -82,8 +97,8 @@ def signup():
 def login():
     """Handle user login."""
 
-    if current_user.is_authenticated:
-        return redirect('/posts')
+    if "firstname" in session:
+        return redirect(f"/users/{session['firstname']}/posts")
 
     form = LoginForm()
 
@@ -93,48 +108,47 @@ def login():
         user = User.query.filter_by(email=email_lowercase).first()
 
         if user and user.check_password(password=form.password.data):
-            login_user(user)
-            return redirect('/posts')
+            session['firstname'] = user.first_name
+            return redirect(f"/users/{user.first_name}/posts")
         else:
             flash("Invalid email/password")
             return render_template('users/login.html', form=form)
             
-    else:
-        return render_template('users/login.html', form=form)
+    return render_template('users/login.html', form=form)
 
 
 
 @app.route('/logout')
-@login_required
 def logout():
-    logout_user()
-    return redirect('/')
+    session.pop("firstname")
+    return redirect("/login")
 
 
-# @app.route('/topics', methods=['POST', 'GET'])
-# def show_topics():
-#     """Show all available topics"""
+@app.route('/topics', methods=['POST', 'GET'])
+def show_topics():
+    """Show all available topics"""
 
-#     if request.method == 'POST':
+    if request.method == 'POST':
 
-#         topics_ids = request.form.getlist('topic')
+        topics_ids = request.form.getlist('topic')
 
-#         if len(topics_ids) != 0:
-#             session['topics'] = topics_ids
-#             return redirect('/signup')
+        if len(topics_ids) != 0:
+            session['topics'] = topics_ids
+            return redirect('/signup')
 
-#         flash("Pick at least one topic")
-#         return redirect('/topics')
+        flash("Pick at least one topic")
+        return redirect('/topics')
         
-#     return render_template('topics.html')
+    return render_template('topics.html')
 
-@app.route('/posts')
-@login_required
-def posts():
+@app.route("/users/<firstname>/posts")
+def posts(firstname):
     """Shows weekly hot posts for current user based on their topics"""
-    print("post")
-    print(current_user.is_authenticated)
-    curr_user_topics = UserTopic.query.filter_by(user_id=current_user.id,isSelected=True).all()
+
+    if "firstname" not in session or firstname != session['firstname']:
+        raise Unauthorized()
+    user = User.query.filter_by(first_name=firstname).one()
+    curr_user_topics = UserTopic.query.filter_by(user_id=user.id,isSelected=True).all()
     subreddit_ids = [s.topic_id for s in curr_user_topics]
     
 
@@ -150,16 +164,18 @@ def posts():
             
         return render_template('users/posts.html', posts=posts)
 
-    print("shdfjldwfbjwehfbqiehrbf;qiwjqefbc")
-    return redirect('/posts')
+    return redirect('/')
 
 
-@app.route('/topics', methods=['POST', 'GET'])
-@login_required
-def show_users_topics():
+@app.route('/users/<firstname>/topics', methods=['POST', 'GET'])
+def show_users_topics(firstname):
     """Show all user's topics"""
 
-    curr_user_topics = UserTopic.query.filter_by(user_id=current_user.id,isSelected=True).all()
+    if "firstname" not in session or firstname != session['firstname']:
+        raise Unauthorized()
+    user = User.query.filter_by(first_name=firstname).one()
+
+    curr_user_topics = UserTopic.query.filter_by(user_id=user.id,isSelected=True).all()
     topics = [s.topic_id for s in curr_user_topics]
 
     if request.method == 'POST': 
@@ -170,14 +186,14 @@ def show_users_topics():
             for x in range(7):
                 topic = str(x+1)
                 if topic in topics_ids:
-                    user_topic =  UserTopic.query.filter_by(user_id=current_user.id, topic_id=x+1).one()
+                    user_topic =  UserTopic.query.filter_by(user_id=user.id, topic_id=x+1).one()
                     user_topic.isSelected = True 
                     db.session.commit()
                 else:
-                    user_topic =  UserTopic.query.filter_by(user_id=current_user.id, topic_id=x+1).one()
+                    user_topic =  UserTopic.query.filter_by(user_id=user.id, topic_id=x+1).one()
                     user_topic.isSelected = False 
                     db.session.commit() 
 
-        return redirect('/posts')
+        return redirect(f"/users/{session['firstname']}/posts")
 
     return render_template('users/topics.html',topics=topics)

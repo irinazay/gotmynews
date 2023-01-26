@@ -1,10 +1,7 @@
 import datetime
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
-from flask_login import LoginManager
- 
-login = LoginManager()
+
 db = SQLAlchemy()
 
 
@@ -107,7 +104,7 @@ class Post(db.Model):
 
 
 
-class User(UserMixin, db.Model):
+class User(db.Model):
     """User in the system."""
 
     __tablename__ = "users"
@@ -164,16 +161,6 @@ class User(UserMixin, db.Model):
     def check_password(self,password):
         return check_password_hash(self.password_hash,password)
 
-
-@login.user_loader
-def load_user(id):
-    """reload the user object from the user ID stored in the session."""
-    print("_________________user_loader__________________")
-    user = User.query.get(int(id))
-    print(user)
-    if user:
-        return user
-    return None
 
 def connect_db(app):
     """Connect database to Flask app."""

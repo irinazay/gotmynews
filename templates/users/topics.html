@@ -1,9 +1,5 @@
 {% extends 'base.html' %} {% block body_class %}onboarding{% endblock %} {%
-block content %} {% if current_user.is_authenticated %}
-<h1>Welcome, {{ current_user.first_name }}!</h1>
-{% else %}
-<h1>Welcome!</h1>
-{% endif %}
+block content %}
 <h2>Please select as many topics as you like:</h2>
 
 <div>
@@ -39,11 +35,7 @@ block content %} {% if current_user.is_authenticated %}
       class="chk-btn" {{"checked" if 7 in topics}} />
       <label for="web_dev">Web Dev</label>
     </div>
-    {% if current_user.is_authenticated %}
     <button class="submit_btn_form" type="submit">Continue</button>
-    {% else %}
-    <button class="submit_btn_form" type="submit">Sign Up Now</button>
-    {% endif %}
   </form>
 </div>
 
