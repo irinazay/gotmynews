@@ -12,7 +12,7 @@ def not_found(e):
   
   return render_template("404.html"), 404
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', "postgres:///gotmynews").replace("://", "ql://", 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', "postgres:///new_gotmynews").replace("://", "ql://", 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'gotmynews1')
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
@@ -64,7 +64,8 @@ def signup():
             session.pop("topics")
             db.session.commit()  # Create new user
             session['firstname'] = user.first_name  # Log in as newly created user
-    
+            session['email'] = user.email
+
             if len( selected_topics) != 0:
                 for x in range(7):
                     topic = str(x+1)
@@ -144,10 +145,9 @@ def show_topics():
 @app.route("/users/<firstname>/posts")
 def posts(firstname):
     """Shows weekly hot posts for current user based on their topics"""
-
     if "firstname" not in session or firstname != session['firstname']:
         raise Unauthorized()
-    user = User.query.filter_by(first_name=firstname).one()
+    user = User.query.filter_by(email=session['email']).one()
     curr_user_topics = UserTopic.query.filter_by(user_id=user.id,isSelected=True).all()
     subreddit_ids = [s.topic_id for s in curr_user_topics]
     
@@ -173,7 +173,7 @@ def show_users_topics(firstname):
 
     if "firstname" not in session or firstname != session['firstname']:
         raise Unauthorized()
-    user = User.query.filter_by(first_name=firstname).one()
+    user = User.query.filter_by(email=session['email']).one()
 
     curr_user_topics = UserTopic.query.filter_by(user_id=user.id,isSelected=True).all()
     topics = [s.topic_id for s in curr_user_topics]
