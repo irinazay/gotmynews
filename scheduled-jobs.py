@@ -16,7 +16,6 @@ import ssl
 
 # take environment variables from .env.
 load_dotenv()
-# define script commands
 manager = Manager(app)
 
 try:
@@ -34,23 +33,21 @@ def posts():
     # Requesting a new access token using a refresh token
     REDDIT_REFRESH_TOKEN = os.environ.get('REDDIT_REFRESH_TOKEN')
     USER_CREDENTIALS = os.environ.get('USER_CREDENTIALS')
-
     resp = requests.post('https://www.reddit.com/api/v1/access_token', 
     headers={'Authorization': f'Basic {USER_CREDENTIALS}',
     'User-Agent': 'macOS:BZNskmtfWcf3Ug:v0.0.1 (by /u/Wonderful_Force_8506)'},
     params={"grant_type": "refresh_token", "refresh_token": REDDIT_REFRESH_TOKEN})
 
     data = resp.json()
-    refresh_token = data['access_token']
+    access_token = data['access_token']
 
 
     # Making daily requests to reddit's API to get one hot post per every predetermed subreddit
     sub = Subreddit.query.all()
     subreddits = [s.url for s in sub]
     for subreddit in subreddits:
-        
         resp = requests.get(f"https://oauth.reddit.com/{subreddit}/top", 
-        headers={'Authorization': f'Bearer {refresh_token}',
+        headers={'Authorization': f'Bearer {access_token}',
         'User-Agent': 'macOS:BZNskmtfWcf3Ug:v0.0.1 (by /u/Wonderful_Force_8506)'},
         params={"limit": 1, "t": "week"})
 
@@ -80,12 +77,14 @@ def emails():
     users = User.query.all()
     for user in users:
     
-        user_topics = user.topics
+        # user_topics = user.topics
+        curr_user_topics = UserTopic.query.filter_by(user_id=user.id,isSelected=True).all()
+        subreddit_ids = [s.topic_id for s in curr_user_topics]
         posts= []
-        for user_topic in user_topics:
-          user_subreddits = user_topic.subreddits
-          user_subreddits_ids = [s.id for s in user_subreddits]
-          post = Post.query.filter(Post.subreddit_id.in_(user_subreddits_ids)).order_by(Post.date.desc()).limit(9).all()
+        for sub_id in subreddit_ids:
+        #   user_subreddits = user_topic.subreddits
+        #   user_subreddits_ids = [s.id for s in user_subreddits]
+          post = Post.query.filter_by(subreddit_id=sub_id).order_by(Post.date.desc()).limit(9).all()
           posts.append(post[0])
 
 
@@ -160,11 +159,10 @@ def emails():
   </html>"""
 
         sendgrid_client = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
-        from_email = From("noreply@irinazaytseva.com", 'Gotmynews')
+        from_email = From(os.environ.get('FROM_EMAIL'), 'Gotmynews')
         to_email = To(f"{user.email}")
         subject = Subject("Your weekly posts")
         html_content = HtmlContent(html_text)
-        print(html_content)
 
         message = Mail(from_email, to_email, subject, html_content)
 
