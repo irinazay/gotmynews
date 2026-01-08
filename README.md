@@ -49,7 +49,6 @@ FROM_EMAIL= ...
 
 After that you will be able to make API requests to Reddit and Sendgrid.
 
-In order to deploy the project, you can create account on Heroku and after install add-ons: Heroku Postgres and Heroku Scheduler.
 <br>
 
 <p>➡️  This is the capstone project 1 for the course Software Engineering at Springboard</p>

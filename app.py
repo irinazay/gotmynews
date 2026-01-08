@@ -12,17 +12,22 @@ def not_found(e):
   
   return render_template("404.html"), 404
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', "postgres:///new_gotmynews").replace("://", "ql://", 1)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'gotmynews1')
-app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+db_uri = os.environ.get("DATABASE_URL", "postgres:///new_gotmynews")
+
+if db_uri.startswith("postgres://"):
+    db_uri = db_uri.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "gotmynews1")
+app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
 
 toolbar = DebugToolbarExtension(app)
 
-app.app_context().push()
 connect_db(app)
-db.create_all()
 
+with app.app_context():
+    db.create_all()
 
 # # =============================================================================
 
