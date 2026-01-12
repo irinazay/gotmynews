@@ -1,9 +1,10 @@
-from app import app
 from models import db, Topic, Subreddit
 
-with app.app_context():
-    db.drop_all()
-    db.create_all()
+def seed_db():
+    # Safety check
+    if Topic.query.first():
+        print("Database already seeded")
+        return
 
     topics = [
         Topic(id=1, name="Artificial Intelligence"),
@@ -29,3 +30,4 @@ with app.app_context():
     db.session.commit()
 
     print("✅ Database seeded correctly")
+

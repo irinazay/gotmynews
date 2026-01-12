@@ -26,8 +26,17 @@ toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 
-with app.app_context():
-    db.create_all()
+# with app.app_context():
+#     db.drop_all()
+#     db.create_all()
+
+#     # Reseed database
+#     from seed_db import seed_db
+#     seed_db()  # TEMPORARY
+
+#     # Run posts job once
+#     from scheduled_jobs import run_posts_job
+#     run_posts_job()  # TEMPORARY
 
 # # =============================================================================
 
