@@ -39,19 +39,23 @@ def posts():
     params={"grant_type": "refresh_token", "refresh_token": REDDIT_REFRESH_TOKEN})
 
     data = resp.json()
-    access_token = data['access_token']
+    access_token = data.get("access_token")
+    print(access_token)
 
+    if not access_token:
+      print("NO ACCESS TOKEN", data)
+      return
 
     # Making daily requests to reddit's API to get one hot post per every predetermed subreddit
     sub = Subreddit.query.all()
     subreddits = [s.url for s in sub]
     for subreddit in subreddits:
-        resp = requests.get(f"https://oauth.reddit.com/{subreddit}/top", 
+        resp = requests.get(f"https://oauth.reddit.com/r/{subreddit}/top", 
         headers={'Authorization': f'Bearer {access_token}',
         'User-Agent': 'macOS:BZNskmtfWcf3Ug:v0.0.1 (by /u/Wonderful_Force_8506)'},
         params={"limit": 1, "t": "week"})
 
-        
+        print(resp.status_code)
         data = resp.json()
 
         title = data['data']['children'][0]['data']['title']
@@ -159,10 +163,12 @@ def emails():
   </html>"""
 
         sendgrid_client = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+        print(user.email)
+        print(sendgrid_client)
         from_email = From(os.environ.get('FROM_EMAIL'), 'Gotmynews')
         to_email = To(f"{user.email}")
         subject = Subject("Your weekly posts")
-        html_content = HtmlContent(html_text)
+        html_content = "sjhbqj"
 
         message = Mail(from_email, to_email, subject, html_content)
 
